@@ -1,0 +1,5 @@
+FileVersion = 1
+Projects = {CurlBeef = {Path = "."}}
+
+[Workspace]
+StartupProject = "CurlBeef"
