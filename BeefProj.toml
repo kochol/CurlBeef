@@ -3,3 +3,19 @@ FileVersion = 1
 [Project]
 Name = "CurlBeef"
 DefaultNamespace = "curl"
+
+[Configs.Debug.Win32]
+LibPaths = ["$(ProjectDir)/dist/win32/Debug/libcurl_d.lib"]
+PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win32/Debug/*.dll\")"]
+
+[Configs.Debug.Win64]
+LibPaths = ["$(ProjectDir)/dist/win64/Debug/libcurl_d.lib"]
+PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win64/Debug/*.dll\")"]
+
+[Configs.Release.Win32]
+LibPaths = ["$(ProjectDir)/dist/win32/Release/libcurl.lib"]
+PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win32/Release/*.dll\")"]
+
+[Configs.Release.Win64]
+LibPaths = ["$(ProjectDir)/dist/win64/Release/libcurl.lib"]
+PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win64/Release/*.dll\")"]
