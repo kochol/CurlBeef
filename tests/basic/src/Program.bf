@@ -7,7 +7,10 @@ namespace basic
 	{
 		static void Main()
 		{
-			Console.WriteLine("Hello");
+			Session se = scope Session();
+			se.Url = new String("http://ip.jsontest.com/");
+			Console.WriteLine(se.GetString());
+			Console.Read();
 		}
 	}
 }
