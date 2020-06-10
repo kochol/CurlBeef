@@ -1,0 +1,6 @@
+FileVersion = 1
+Dependencies = {corlib = "*", CurlBeef = "*"}
+
+[Project]
+Name = "basic"
+StartupObject = "basic.Program"
