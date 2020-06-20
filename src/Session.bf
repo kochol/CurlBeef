@@ -29,7 +29,6 @@ namespace curl
 		static int Write(void* dataPtr, int size, int count, void* ctx)
 		{
 			Session s = (Session)Internal.UnsafeCastToObject(ctx);
-			s.body.Clear();
 			s.body.Append((char8*)dataPtr, size * count);
 			return count;
 		}
@@ -42,6 +41,7 @@ namespace curl
 			easy.SetOpt(.AcceptEncoding, "");
 
 			error_buf.Set("");
+			body.Clear();
 
 			function int(void* ptr, int size, int count, void* ctx) writeFunc = => Write;
 			easy.SetOptFunc(.WriteFunction, (void*)writeFunc);
