@@ -858,7 +858,7 @@ namespace curl
 		static extern void* curl_easy_init();
 
 		[CLink]
-		static extern int curl_easy_setopt(void* curl, int option, int optVal);
+		static extern int32 curl_easy_setopt(void* curl, int32 option, int optVal);
 
 		[CLink]
 		static extern void* curl_easy_duphandle(void* curl);
@@ -867,10 +867,10 @@ namespace curl
 		static extern void* curl_easy_cleanup(void* curl);
 
 		[CLink]
-		static extern int curl_easy_perform(void* curl);
+		static extern int32 curl_easy_perform(void* curl);
 
 		[CLink]
-		static extern void* curl_easy_getinfo(void* curl, Option option, void* ptr);
+		static extern int32 curl_easy_getinfo(void* curl, int32 option, void* ptr);
 
 		[CLink]
 		static extern void* curl_easy_reset(void* curl);
@@ -907,22 +907,61 @@ namespace curl
 			return .Err(returnCode);
 		}
 
+		Result<T, ReturnCode> WrapResult<T>(ReturnCode returnCode, T val)
+		{
+			if (returnCode == .Ok)
+				return .Ok(val);
+			return .Err(returnCode);
+		}
+
+		public Result<int64, ReturnCode> GetInfoLong(CurlInfo info)
+		{
+			Debug.Assert((int32)info & cInfoTypeMask == cInfoLong);
+			int64 p = 0;
+			let r = curl_easy_getinfo(mCURL, (int32)info, (void*)&p);
+			return WrapResult((ReturnCode)r, p);
+		}
+
+		public Result<char8*, ReturnCode> GetInfoString(CurlInfo info)
+		{
+			Debug.Assert((int32)info & cInfoTypeMask == cInfoString);
+			char8* p = null;
+			let r = curl_easy_getinfo(mCURL, (int32)info, (void*)&p);
+			return WrapResult((ReturnCode)r, p);
+		}
+
+		public Result<void*, ReturnCode> GetInfoSList(CurlInfo info)
+		{
+			Debug.Assert((int32)info & cInfoTypeMask == cInfoSList);
+			void* p = null;
+			let r = curl_easy_getinfo(mCURL, (int32)info, p);
+			return WrapResult((ReturnCode)r, p);
+		}
+
+		public Result<double, ReturnCode> GetInfoDouble(CurlInfo info)
+		{
+			Debug.Assert((int32)info & cInfoTypeMask == cInfoDouble);
+			double p = 0;
+			let r = curl_easy_getinfo(mCURL, (int32)info, (void*)&p);
+			return WrapResult((ReturnCode)r, p);
+		}
+
 		public Result<void, ReturnCode> SetOpt(Option option, bool val)
 		{
 			Debug.Assert((int)option / 10000 == 0);
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, val ? 1 : 0));
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, val ? 1 : 0));
 		}
 
 		public Result<void, ReturnCode> SetOpt(Option option, String val)
 		{
 			Debug.Assert((int)option / 10000 == 1);
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)val.CStr()));
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, (int)(void*)val.CStr()));
 		}
 
 		public Result<void, ReturnCode> SetOpt(Option option, curl_slist* val)
 		{
 			Debug.Assert((int)option / 10000 == 1);
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)val));
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, (int)(void*)val));
 		}
 
 		public Result<void, ReturnCode> SetOpt(Option option, List<String> val)
@@ -933,7 +972,7 @@ namespace curl
 			{
 				list = curl_slist_append(list, s);
 			}
-			let r = WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)list));
+			let r = WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, (int)(void*)list));
 			curl_slist_free_all(list);
 			return r;
 		}
@@ -941,19 +980,19 @@ namespace curl
 		public Result<void, ReturnCode> SetOpt(Option option, int val)
 		{
 			Debug.Assert(((int)option / 10000 == 0) || ((int)option / 10000 == 3));
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, val));
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, val));
 		}
 
 		public Result<void, ReturnCode> SetOpt(Option option, void* val)
 		{
-			Debug.Assert((int)option / 10000 == 1);
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)val));
+			Debug.Assert((int32)option / 10000 == 1);
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, (int)val));
 		}
 
 		public Result<void, ReturnCode> SetOptFunc(Option option, void* funcPtr)
 		{
 			Debug.Assert((int)option / 10000 == 2);
-			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)funcPtr));
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int32)option, (int)funcPtr));
 		}
 
 		public Result<void, ReturnCode> Perform()
