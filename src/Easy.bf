@@ -934,7 +934,7 @@ namespace curl
 		{
 			Debug.Assert((int32)info & cInfoTypeMask == cInfoSList);
 			void* p = null;
-			let r = curl_easy_getinfo(mCURL, (int32)info, p);
+			let r = curl_easy_getinfo(mCURL, (int32)info, &p);
 			return WrapResult((ReturnCode)r, p);
 		}
 
