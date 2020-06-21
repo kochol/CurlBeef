@@ -11,6 +11,7 @@ namespace curl
 		Easy.curl_slist* headers = null ~ Easy.curl_slist_free_all(_);
 		String error_buf = new String(256) ~ delete _;
 		public URL Url = null;
+		public int64 ResponseCode = 0;
 		String body = new String() ~ delete _;
 
 		/** Constructor
@@ -68,7 +69,12 @@ namespace curl
 			easy.SetOptFunc(.WriteFunction, (void*)writeFunc);
 			easy.SetOpt(.WriteData, Internal.UnsafeCastToPtr(this));
 
-			return easy.Perform();
+			let r = easy.Perform();
+
+			if (r == .Ok)
+				ResponseCode = easy.GetInfoLong(.ResponseCode);
+
+			return r;
 		}
 
 		public Result<void, Easy.ReturnCode> SetHeaders(List<String> _headers)
