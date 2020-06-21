@@ -35,7 +35,7 @@ namespace curl
 
 		/** Create request and send it
 		*/
-		void makeRequest()
+		Result<void, Easy.ReturnCode> makeRequest()
 		{
 			String url = scope String(Url);
 			url.Replace("%", "%25");
@@ -66,15 +66,21 @@ namespace curl
 			easy.SetOptFunc(.WriteFunction, (void*)writeFunc);
 			easy.SetOpt(.WriteData, Internal.UnsafeCastToPtr(this));
 
-			easy.Perform();
+			return easy.Perform();
 		}
 
 		/** Returns the site data as string
 		*/
-		public String GetString()
+		public Result<String, Easy.ReturnCode> GetString()
 		{
-			makeRequest();
-			return body;
+			let r = makeRequest();
+			switch (r)
+			{
+			case .Err(let err):
+				return .Err(err);
+			case .Ok:
+				return .Ok(body);
+			}
 		}
 	}
 }
