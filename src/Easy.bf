@@ -875,13 +875,13 @@ namespace curl
 		[CLink]
 		static extern void* curl_easy_reset(void* curl);
 
-		struct curl_slist;
+		public struct curl_slist;
 
 		[CLink]
-		static extern curl_slist* curl_slist_append(curl_slist* list, char8* string);
+		public static extern curl_slist* curl_slist_append(curl_slist* list, char8* string);
 
 		[CLink]
-		static extern void curl_slist_free_all(curl_slist* list);
+		public static extern void curl_slist_free_all(curl_slist* list);
 
 		void* mCURL;
 
@@ -919,12 +919,19 @@ namespace curl
 			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)val.CStr()));
 		}
 
+		public Result<void, ReturnCode> SetOpt(Option option, curl_slist* val)
+		{
+			Debug.Assert((int)option / 10000 == 1);
+			return WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)val));
+		}
+
 		public Result<void, ReturnCode> SetOpt(Option option, List<String> val)
 		{
+			Debug.Assert((int)option / 10000 == 1);
 			curl_slist* list = null;
 			for (var s in val)
 			{
-				curl_slist_append(list, s);
+				list = curl_slist_append(list, s);
 			}
 			let r = WrapResult((ReturnCode)curl_easy_setopt(mCURL, (int)option, (int)(void*)list));
 			curl_slist_free_all(list);
