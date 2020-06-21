@@ -38,8 +38,8 @@ namespace curl
 		void makeRequest()
 		{
 			String url = scope String(Url);
-			url.Replace(" ", "%20");
 			url.Replace("%", "%25");
+			url.Replace(" ", "%20");
 			url.Replace("\"", "%22");
 			url.Replace("<", "%3C");
 			url.Replace(">", "%3E");
