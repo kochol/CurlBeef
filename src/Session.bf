@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace curl
 {
@@ -7,8 +8,9 @@ namespace curl
 	public class Session
 	{
 		Easy easy = new Easy() ~ delete _;
+		Easy.curl_slist* headers = null ~ Easy.curl_slist_free_all(_);
 		String error_buf = new String(256) ~ delete _;
-		public URL Url = null ~ delete _;
+		public URL Url = null;
 		String body = new String() ~ delete _;
 
 		/** Constructor
@@ -67,6 +69,19 @@ namespace curl
 			easy.SetOpt(.WriteData, Internal.UnsafeCastToPtr(this));
 
 			return easy.Perform();
+		}
+
+		public Result<void, Easy.ReturnCode> SetHeaders(List<String> _headers)
+		{
+			if (headers != null)
+			{
+				Easy.curl_slist_free_all(headers);
+				headers = null;
+			}
+			if (_headers != null)
+				for (var s in _headers)
+					headers = Easy.curl_slist_append(headers, s);
+			return easy.SetOpt(.HTTPHeader, headers);
 		}
 
 		/** Returns the site data as string
