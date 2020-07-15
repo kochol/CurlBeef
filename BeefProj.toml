@@ -12,6 +12,10 @@ PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win32/Debug/*.dll\")"]
 LibPaths = ["$(ProjectDir)/dist/win64/Debug/libcurl-d.lib"]
 PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win64/Debug/*.dll\")"]
 
+[Configs.Debug.Linux64]
+OtherLinkFlags = "$(LinkFlags) -lcrypto -lcurl -lssl -lz"
+LibPaths = ["L$(ProjectDir)/dist/linux64/ServerDebug/"]
+
 [Configs.Release.Win32]
 LibPaths = ["$(ProjectDir)/dist/win32/Release/libcurl.lib"]
 PostBuildCmds = ["CopyToDependents(\"$(ProjectDir)/dist/win32/Release/*.dll\")"]
