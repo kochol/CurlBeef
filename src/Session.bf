@@ -7,6 +7,13 @@ namespace curl
 
 	public class Session
 	{
+		public enum Verbs
+		{
+			Get,
+			Post,
+			Put
+		}
+
 		Easy easy = new Easy() ~ delete _;
 		Easy.curl_slist* headers = null ~ Easy.curl_slist_free_all(_);
 		String error_buf = new String(256) ~ delete _;
@@ -88,6 +95,22 @@ namespace curl
 				for (var s in _headers)
 					headers = Easy.curl_slist_append(headers, s);
 			return easy.SetOpt(.HTTPHeader, headers);
+		}
+
+		public void SetVerb(Verbs verb)
+		{
+			switch (verb)
+			{
+			case .Get:
+				easy.SetOpt(.Post, false);
+				easy.SetOpt(.Put, false);
+			case .Post:
+				easy.SetOpt(.Post, true);
+				easy.SetOpt(.Put, false);
+			case .Put:
+				easy.SetOpt(.Post, false);
+				easy.SetOpt(.Put, true);
+			}
 		}
 
 		/** Returns the site data as string
