@@ -21,6 +21,10 @@ namespace curl
 		public int64 ResponseCode = 0;
 		String body = new String() ~ delete _;
 
+		uint8* file_data;
+		int32 file_size;
+		int32 file_read;
+
 		/** Constructor
 		* Set up some defaults
 		*/
@@ -110,6 +114,62 @@ namespace curl
 			case .Put:
 				easy.SetOpt(.Post, false);
 				easy.SetOpt(.Put, true);
+			}
+		}
+
+		static int read_callback(void* dataPtr, int size, int count, void* ctx)
+		{
+			Session s = (Session)Internal.UnsafeCastToObject(ctx);
+
+			int read = s.file_size - s.file_read;
+			if (read == 0)
+				return 0;
+			if (read > size * count)
+				read = size * count;
+
+			Internal.MemCpy(dataPtr, s.file_data, read);
+			Console.WriteLine("DEBUG: Read {} bytes", read);
+			return read;
+		}
+
+		public void AddFileToUpload(uint8* data, int32 size)
+		{
+			file_data = data;
+			file_size = size;
+			file_read = 0;
+
+			if (data == null)
+			{
+				// reset upload data
+				easy.SetOptFunc(.ReadFunction, null);
+
+				/* enable uploading */ 
+				easy.SetOpt(.Upload, false);
+
+				/* now specify which file to upload */ 
+				easy.SetOpt(.ReadData, (void*)null);
+
+				/* provide the size of the upload, we specicially typecast the value
+				   to curl_off_t since we must be sure to use the correct data size */ 
+				easy.SetOpt(.InfileSize, 0);
+			}
+			else
+			{
+				// set the file
+
+				/* we want to use our own read function */
+				function int(void* ptr, int size, int count, void* stream) readFunc = => read_callback;
+				easy.SetOptFunc(.ReadFunction, (void*)readFunc);
+
+				/* enable uploading */ 
+				easy.SetOpt(.Upload, true);
+
+				/* now specify which file to upload */ 
+				easy.SetOpt(.ReadData, Internal.UnsafeCastToPtr(this));
+
+				/* provide the size of the upload, we specicially typecast the value
+				   to curl_off_t since we must be sure to use the correct data size */ 
+				easy.SetOpt(.InfileSize, size);
 			}
 		}
 
