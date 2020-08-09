@@ -106,11 +106,11 @@ namespace curl
 			switch (verb)
 			{
 			case .Get:
-				easy.SetOpt(.HTTPGet, true);
+				easy.SetOpt(.Customrequest, "GET");
 			case .Post:
 				easy.SetOpt(.Customrequest, "POST");
 			case .Put:
-				easy.SetOpt(.Put, true);
+				easy.SetOpt(.Customrequest, "PUT");
 			}
 		}
 
