@@ -106,13 +106,10 @@ namespace curl
 			switch (verb)
 			{
 			case .Get:
-				easy.SetOpt(.Post, false);
-				easy.SetOpt(.Put, false);
+				easy.SetOpt(.HTTPGet, true);
 			case .Post:
-				easy.SetOpt(.Post, true);
-				easy.SetOpt(.Put, false);
+				easy.SetOpt(.Customrequest, "POST");
 			case .Put:
-				easy.SetOpt(.Post, false);
 				easy.SetOpt(.Put, true);
 			}
 		}
@@ -171,6 +168,11 @@ namespace curl
 				   to curl_off_t since we must be sure to use the correct data size */ 
 				easy.SetOpt(.InfileSize, size);
 			}
+		}
+
+		public void SetRequestBody(String _body)
+		{
+			easy.SetOpt(.Postfields, _body);
 		}
 
 		/** Returns the site data as string
